@@ -64,18 +64,6 @@ def DataLoad():
     return
 
 #
-#   function: DataPrepare
-#   Loads inputs, expands to 3d from 2d, 
-#   converts to appropriate type and scales for binary crossentropy
-#
-def DataPrepare():
-
-    (inputsTrain, _) (_, _) = load.data()
-    expansion = expand_dims(inputsTrain, axis=-1)
-    expansion = expansion.astype('float32') / 255.0
-    return expansion
-
-#
 #   function: DataGenReal
 #   Gens actual samples via random
 #
@@ -98,13 +86,15 @@ def DataGenFake(SampleNum):
 
 #
 #   function: DataPreproc
-#   Loads input from training, 
-#   converts 2d into 3d for CNN input,
-#   scales vals to 0 and 1
+#   Loads inputs, expands to 3d from 2d, 
+#   converts to appropriate type and scales for binary crossentropy
 #
 def DataPreproc():
 
-
+    (inputsTrain, _) (_, _) = load.data()
+    expansion = expand_dims(inputsTrain, axis=-1)
+    expansion = expansion.astype('float32') / 255.0
+    return expansion
 
 #
 #   function: DiscriminatorSetup
@@ -125,7 +115,7 @@ def DiscriminatorSetup(shape):
     return model
 
 #
-#   function: ModelSetup
+#   function: Model
 #   Literally the name
 #
 def ModelSetup():
@@ -134,17 +124,26 @@ def ModelSetup():
     utils.plot_model(model, to_file='Discriminator-Plot.png', show_shapes=True, show_layer_names=True)
 
 #
+#   function: ModelTrain
+#   Revs up the discriminator
+#
+def ModelTrain():
+    
+
+
+#
 #   function: main
 #   Runs the whole thing   
 #
 def main():
     
-    """stuff goes here"""
+    """data phase"""
     DataLoad()
     DataPreproc()
+
+    """Model phase"""
     ModelSetup()
-    #ModelLoad()
-    #ModelTrain()
+    ModelTrain()
     #ModelTest()
     #ModelPersist()
     return 1
