@@ -28,6 +28,7 @@ Planned setup: Procedural
 from tensorflow import keras
 from keras import layers
 from keras import utils
+from keras import optimizers
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
@@ -63,12 +64,55 @@ def DataLoad():
     return
 
 #
+#   function: DataPrepare
+#   Loads inputs, expands to 3d from 2d, 
+#   converts to appropriate type and scales for binary crossentropy
+#
+def DataPrepare():
+
+    (inputsTrain, _) (_, _) = load.data()
+    expansion = expand_dims(inputsTrain, axis=-1)
+    expansion = expansion.astype('float32') / 255.0
+    return expansion
+
+#
+#   function: DataGenReal
+#   Gens actual samples via random
+#
+def DataGenReal(dataset, SampleNum):
+    
+    inputs = dataset[randint(0, dataset.shape[0], SampleNum)]
+    targets = ones((SampleNum, 1))
+    return inputs, targets
+
+#
+#   function: DataGenFake
+#   Gens nonreal samples, via uniform rand num between 0 and 1
+#
+def DataGenFake(SampleNum):
+
+    inputs = rand( 28 * 28 * SampleNum )
+    inputs = inputs.reshape(( SampleNum,28,28,1 ))
+    targets = zeros(( SampleNum,1 ))
+    return inputs, targets
+
+#
+#   function: DataPreproc
+#   Loads input from training, 
+#   converts 2d into 3d for CNN input,
+#   scales vals to 0 and 1
+#
+def DataPreproc():
+
+
+
+#
 #   function: DiscriminatorSetup
 #   Setup the discriminator portion
 #
-def DiscriminatorSetup():
+def DiscriminatorSetup(shape):
     model = keras.Sequential([
-        layers.Conv2D(64, ( 3,3 ), strides=( 2,2 ), padding='same', input_shape='in_shape'),
+        layers.Conv2D(64, ( 3,3 ), strides=( 2,2 ), padding='same', input_shape=shape),
         layers.LeakyReLU(alpha=0.2),
         layers.Dropout(0.4),
         layers.Conv2D(64, ( 3,3 ), strides=( 2,2 ), padding='same'),
@@ -77,8 +121,7 @@ def DiscriminatorSetup():
         layers.Flatten(),
         layers.Dense(1, activation='sigmoid')
     ])
-    mizer = Adam(lr=2e-4, beta_1=0.5)
-    model.compile(loss='binary_crossentropy', optimizer=mizer, metrics=['accuracy'])
+    model.compile(loss='binary_crossentropy', optimizer=optimizers.Adam(lr=2e-4, beta_1=0.5), metrics=['accuracy'])
     return model
 
 #
@@ -86,8 +129,8 @@ def DiscriminatorSetup():
 #   Literally the name
 #
 def ModelSetup():
-    model = DiscriminatorSetup()
-    model.summary()
+    model = DiscriminatorSetup((28,28,1))
+    print(model.summary())
     utils.plot_model(model, to_file='Discriminator-Plot.png', show_shapes=True, show_layer_names=True)
 
 #
@@ -98,7 +141,7 @@ def main():
     
     """stuff goes here"""
     DataLoad()
-    #DataPreproc()
+    DataPreproc()
     ModelSetup()
     #ModelLoad()
     #ModelTrain()
