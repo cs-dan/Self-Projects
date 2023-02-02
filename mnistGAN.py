@@ -1,7 +1,9 @@
 """
+author: cs-dan
+"""
+"""
 Wanted to learn how to make a GAN
-"""
-"""
+
 For self:
     "the point"
     GANS are for generating, you're trying to create something.
@@ -25,10 +27,10 @@ Planned setup: Procedural
 #
 from tensorflow import keras
 from keras import layers
+from keras import utils
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
-
 
 #
 #   Globals
@@ -61,6 +63,34 @@ def DataLoad():
     return
 
 #
+#   function: DiscriminatorSetup
+#   Setup the discriminator portion
+#
+def DiscriminatorSetup():
+    model = keras.Sequential([
+        layers.Conv2D(64, ( 3,3 ), strides=( 2,2 ), padding='same', input_shape='in_shape'),
+        layers.LeakyReLU(alpha=0.2),
+        layers.Dropout(0.4),
+        layers.Conv2D(64, ( 3,3 ), strides=( 2,2 ), padding='same'),
+        layers.LeakyReLU(alpha=0.2),
+        layers.Dropout(0.4),
+        layers.Flatten(),
+        layers.Dense(1, activation='sigmoid')
+    ])
+    mizer = Adam(lr=2e-4, beta_1=0.5)
+    model.compile(loss='binary_crossentropy', optimizer=mizer, metrics=['accuracy'])
+    return model
+
+#
+#   function: ModelSetup
+#   Literally the name
+#
+def ModelSetup():
+    model = DiscriminatorSetup()
+    model.summary()
+    utils.plot_model(model, to_file='Discriminator-Plot.png', show_shapes=True, show_layer_names=True)
+
+#
 #   function: main
 #   Runs the whole thing   
 #
@@ -69,11 +99,12 @@ def main():
     """stuff goes here"""
     DataLoad()
     #DataPreproc()
-    #ModelSetup()
+    ModelSetup()
     #ModelLoad()
     #ModelTrain()
     #ModelTest()
     #ModelPersist()
+    return 1
 
 #
 #   Start
