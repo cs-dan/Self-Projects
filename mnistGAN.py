@@ -1,5 +1,6 @@
 """
 author: cs-dan
+adapted from: https://machinelearningmastery.com/how-to-develop-a-generative-adversarial-network-for-an-mnist-handwritten-digits-from-scratch-in-keras/
 """
 """
 Wanted to learn how to make a GAN
@@ -29,6 +30,7 @@ from tensorflow import keras
 from keras import layers
 from keras import utils
 from keras import optimizers
+from keras.datasets.mnist import load_data
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
@@ -56,7 +58,6 @@ def SamplePlot(size, dataset):
 #
 def DataLoad():
     
-    from keras.datasets.mnist import load_data
     (inputsTrain, targetsTrain), (inputsTest, targetsTest) = load_data()
     print(f'Training set shape: {inputsTrain.shape, targetsTrain.shape} \nTesting set shape: {inputsTest.shape, targetsTest.shape}')
     plt.figure('Dataset Sampleset ( 5x5 )')
@@ -69,8 +70,9 @@ def DataLoad():
 #
 def DataGenReal(dataset, SampleNum):
     
-    inputs = dataset[randint(0, dataset.shape[0], SampleNum)]
-    targets = ones((SampleNum, 1))
+    index = np.random.randint(0, dataset.shape[0], SampleNum)
+    inputs = dataset[index]
+    targets = np.ones((SampleNum, 1))
     return inputs, targets
 
 #
@@ -79,9 +81,9 @@ def DataGenReal(dataset, SampleNum):
 #
 def DataGenFake(SampleNum):
 
-    inputs = rand( 28 * 28 * SampleNum )
+    inputs = np.random.rand( 28 * 28 * SampleNum )
     inputs = inputs.reshape(( SampleNum,28,28,1 ))
-    targets = zeros(( SampleNum,1 ))
+    targets = np.zeros(( SampleNum,1 ))
     return inputs, targets
 
 #
@@ -91,8 +93,8 @@ def DataGenFake(SampleNum):
 #
 def DataPreproc():
 
-    (inputsTrain, _) (_, _) = load.data()
-    expansion = expand_dims(inputsTrain, axis=-1)
+    (inputsTrain, _), (_, _) = load_data()
+    expansion = np.expand_dims(inputsTrain, axis=-1)
     expansion = expansion.astype('float32') / 255.0
     return expansion
 
@@ -115,21 +117,36 @@ def DiscriminatorSetup(shape):
     return model
 
 #
-#   function: Model
+#   function: DiscriminatorTrain
+#   Train on discriminator
+#
+def DiscriminatorTrain(model, dataset, IterNum, BatchNum):
+
+    for i in range(IterNum):
+        inputsTrue, targetsTrue = DataGenReal(dataset, int(BatchNum / 2))
+        inputsFalse, targetsFalse = DataGenFake(int(BatchNum / 2))
+        _, accuracyTrue = model.train_on_batch(inputsTrue, targetsTrue)
+        _, accuracyFalse = model.train_on_batch(inputsFalse, targetsFalse)
+        print(f'@ iteration {i} - Real image accuracy: {accuracyTrue*100}% \tFake image accuracy: {accuracyFalse*100}%')
+    return model
+
+#
+#   function: ModelSetup
 #   Literally the name
 #
 def ModelSetup():
-    model = DiscriminatorSetup((28,28,1))
+    model = DiscriminatorSetup(( 28,28,1 ))
     print(model.summary())
-    utils.plot_model(model, to_file='Discriminator-Plot.png', show_shapes=True, show_layer_names=True)
+    #utils.plot_model(model, to_file='Discriminator-Plot.png', show_shapes=True, show_layer_names=True)
+    return model
 
 #
 #   function: ModelTrain
-#   Revs up the discriminator
+#   Revs up that discriminator
 #
-def ModelTrain():
-    
-
+def ModelTrain(model):
+    dataset = DataPreproc()
+    model = DiscriminatorTrain(model, dataset, 100, 256)
 
 #
 #   function: main
@@ -139,13 +156,13 @@ def main():
     
     """data phase"""
     DataLoad()
-    DataPreproc()
 
-    """Model phase"""
-    ModelSetup()
-    ModelTrain()
+    """model phase"""
+    model = ModelSetup()
+    ModelTrain(model)
     #ModelTest()
     #ModelPersist()
+
     return 1
 
 #
