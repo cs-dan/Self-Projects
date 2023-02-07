@@ -43,6 +43,7 @@ def SamplePlot(size, dataset):
 def DataProc():
 
     (inputsTrain, targetsTrain), (inputsTest, targetsTest) = load_data()
+    targetsTrain, targetsTest = targetsTrain[:,0], targetsTest[:,0]
     print(f'Training set shape: {inputsTrain.shape, targetsTrain.shape} \tTesting set shape: {inputsTest.shape, targetsTest.shape}')
     plt.figure('Dataset Sampleset ( 10x10 )')
     SamplePlot(100, inputsTrain)

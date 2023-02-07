@@ -125,28 +125,66 @@ def DiscriminatorTrain(model, dataset, IterNum, BatchNum):
     for i in range(IterNum):
         inputsTrue, targetsTrue = DataGenReal(dataset, int(BatchNum / 2))
         inputsFalse, targetsFalse = DataGenFake(int(BatchNum / 2))
-        _, accuracyTrue = model.train_on_batch(inputsTrue, targetsTrue)
-        _, accuracyFalse = model.train_on_batch(inputsFalse, targetsFalse)
-        print(f'@ iteration {i} - Real image accuracy: {accuracyTrue*100}% \tFake image accuracy: {accuracyFalse*100}%')
+        lossTrue, accuracyTrue = model.train_on_batch(inputsTrue, targetsTrue)
+        lossFalse, accuracyFalse = model.train_on_batch(inputsFalse, targetsFalse)
+        print(f'@ iteration {i} - Real image accuracy: {accuracyTrue*100:.2f}% \tFake image accuracy: {accuracyFalse*100:.2f}% \tLoss on True set: {lossTrue:.2f} \tLoss on False set: {lossFalse:.2f}')
     return model
 
 #
-#   function: ModelSetup
+#   function: DisModelSetup
 #   Literally the name
 #
-def ModelSetup():
+def DisModelSetup():
+
     model = DiscriminatorSetup(( 28,28,1 ))
     print(model.summary())
     #utils.plot_model(model, to_file='Discriminator-Plot.png', show_shapes=True, show_layer_names=True)
     return model
 
 #
-#   function: ModelTrain
+#   function: DisModelTrain
 #   Revs up that discriminator
 #
-def ModelTrain(model):
+def DisModelTrain(model):
+    
     dataset = DataPreproc()
     model = DiscriminatorTrain(model, dataset, 100, 256)
+    return
+
+#
+#   function: GeneratorSetup
+#   Defines the Gen
+#
+def GeneratorSetup(latentDims):
+
+    model = keras.Sequential([
+        #   base 7x7
+        layers.Dense(128 * ( 7*7 ), input_dim=latentDims),
+        layers.LeakyReLU(alpha=0.2),
+        layers.Reshape(( 7,7,128 )),
+        #   up to 14x14
+        layers.Conv2DTranspose(128, ( 4,4 ), strides=( 2,2 ), padding='same'),
+        layers.LeakyReLU(alpha=0.2),
+        #   up to 28x28
+        layers.Conv2DTranspose(128, ( 4,4 ), strides=( 2,2 ), padding='same'),
+        layers.LeakyReLU(alpha=0.2),
+        layers.LeakyReLU(alpha=0.2),
+        layers.Conv2D(1, ( 7,7 ), activation='sigmoid', padding='same')
+    ])
+    return model
+
+#
+#   function: GenModelSetup
+#   Setups the gen and prints info about the structure
+#
+def GenModelSetup():
+
+    latentDims = 100
+    model = GeneratorSetup(latentDims)
+    print(model.summary())
+    #utils.plot_model(model, to_file='Discriminator-Plot.png', show_shapes=True, show_layer_names=True)
+    return model
+
 
 #
 #   function: main
@@ -157,9 +195,14 @@ def main():
     """data phase"""
     DataLoad()
 
-    """model phase"""
-    model = ModelSetup()
-    ModelTrain(model)
+    """model (discriminator) phase"""
+    # model = DisModelSetup()
+    # DisModelTrain(model)
+    
+    """model (generator) phase"""
+    model = GenModelSetup()
+    #GeneratorTrain(model)
+    
     #ModelTest()
     #ModelPersist()
 
