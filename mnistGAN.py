@@ -168,7 +168,6 @@ def GeneratorSetup(latentDims):
         #   up to 28x28
         layers.Conv2DTranspose(128, ( 4,4 ), strides=( 2,2 ), padding='same'),
         layers.LeakyReLU(alpha=0.2),
-        layers.LeakyReLU(alpha=0.2),
         layers.Conv2D(1, ( 7,7 ), activation='sigmoid', padding='same')
     ])
     return model
