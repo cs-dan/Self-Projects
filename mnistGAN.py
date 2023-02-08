@@ -39,6 +39,10 @@ import numpy as np
 #   Globals
 #
 
+###
+### DATA PROCESSING AND ACCESSORIES
+###
+
 #
 #   function: SamplePlot
 #   Plots from dataset
@@ -98,6 +102,10 @@ def DataPreproc():
     expansion = expansion.astype('float32') / 255.0
     return expansion
 
+###
+### DISCRIMINATOR AND ACCESSORIES
+###
+
 #
 #   function: DiscriminatorSetup
 #   Setup the discriminator portion
@@ -151,6 +159,35 @@ def DisModelTrain(model):
     model = DiscriminatorTrain(model, dataset, 100, 256)
     return
 
+###
+### GENERATOR AND ACCESSORIES
+###
+
+#
+#   function: GenLatent
+#   Generates the points in latent space to use as input
+#
+def GenLatent(dims, numInputs):
+
+    X = randn(dims, * numInputs)
+    x = X.reshape(numInputs, dims)
+    return X
+
+#
+#   function: GeneratorGenFake
+#   Gens fake x and y 
+#
+def GeneratorGenFake(model, dims, numInputs):
+    X = GenLatent(dims, numInputs)
+    Y = zeros((numInputs, 1))
+    X = model.predict(X)
+    return X, Y
+
+#
+#   
+#
+#
+
 #
 #   function: GeneratorSetup
 #   Defines the Gen
@@ -184,6 +221,9 @@ def GenModelSetup():
     #utils.plot_model(model, to_file='Discriminator-Plot.png', show_shapes=True, show_layer_names=True)
     return model
 
+###
+### MAIN SCRIPT
+###
 
 #
 #   function: main
