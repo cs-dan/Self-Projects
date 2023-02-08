@@ -169,8 +169,8 @@ def DisModelTrain(model):
 #
 def GenLatent(dims, numInputs):
 
-    X = randn(dims, * numInputs)
-    x = X.reshape(numInputs, dims)
+    X = np.random.randn(dims, numInputs)
+    X = X.reshape(numInputs, dims)
     return X
 
 #
@@ -179,14 +179,9 @@ def GenLatent(dims, numInputs):
 #
 def GeneratorGenFake(model, dims, numInputs):
     X = GenLatent(dims, numInputs)
-    Y = zeros((numInputs, 1))
+    Y = np.zeros((numInputs, 1))
     X = model.predict(X)
     return X, Y
-
-#
-#   
-#
-#
 
 #
 #   function: GeneratorSetup
@@ -215,11 +210,23 @@ def GeneratorSetup(latentDims):
 #
 def GenModelSetup():
 
-    latentDims = 100
-    model = GeneratorSetup(latentDims)
+    LatentDims = 100
+    numInputs = 25
+    model = GeneratorSetup(LatentDims)
     print(model.summary())
     #utils.plot_model(model, to_file='Discriminator-Plot.png', show_shapes=True, show_layer_names=True)
+    X, _ = GeneratorGenFake(model, LatentDims, numInputs)
+    SamplePlot(numInputs, X)
     return model
+
+###
+### GAN MODEL   (Not a model itself, but a collection of both)
+###
+
+#
+#   function: GANsetup
+#   Sets up the GAN model
+#   
 
 ###
 ### MAIN SCRIPT
