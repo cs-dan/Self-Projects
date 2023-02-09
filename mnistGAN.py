@@ -178,6 +178,7 @@ def GenLatent(dims, numInputs):
 #   Gens fake x and y 
 #
 def GeneratorGenFake(model, dims, numInputs):
+
     X = GenLatent(dims, numInputs)
     Y = np.zeros((numInputs, 1))
     X = model.predict(X)
@@ -271,11 +272,11 @@ def main():
     
     """model (generator) phase"""
     model = GenModelSetup()
-    #GeneratorTrain(model)
+    model = GeneratorTrain(model)
     
     #ModelTest()
     #ModelPersist()
-
+    
     return 1
 
 #
