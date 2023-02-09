@@ -216,6 +216,7 @@ def GenModelSetup():
     print(model.summary())
     #utils.plot_model(model, to_file='Discriminator-Plot.png', show_shapes=True, show_layer_names=True)
     X, _ = GeneratorGenFake(model, LatentDims, numInputs)
+    plt.figure('\'Generated\' Sampleset ( 5x5 )')
     SamplePlot(numInputs, X)
     return model
 
@@ -225,8 +226,31 @@ def GenModelSetup():
 
 #
 #   function: GANsetup
+#   Defines the GAN
+#   
+def GANsetup(dis, gen):
+
+    dis.trainable = False       #sets the discriminator as untrainable
+    model = Sequential([
+        gen,
+        dis
+    ])
+    model.compile(loss = "binary_crossentropy", optimizer = Adam( lr = 2e-4, beta_1 = 0.5 ))
+    return model
+
+#
+#   function: GANmodelsetup
 #   Sets up the GAN model
 #   
+def GANmodelsetup():
+
+    LatentDims = 100
+    dis = DisModelSetup()
+    gen = GenModelSetup(LatentDims)
+    gan = GANsetup(dis, gen)
+    print(gan.summary())
+    #utils.plot_model(gan, to_file='GAN-plot', show_shapes=True, show_layer_names=True)
+    return gan
 
 ###
 ### MAIN SCRIPT
