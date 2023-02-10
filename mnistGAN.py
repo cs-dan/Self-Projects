@@ -272,11 +272,11 @@ def main():
     
     """model (generator) phase"""
     model = GenModelSetup()
-    model = GeneratorTrain(model)
+    GeneratorTrain(model)
     
     #ModelTest()
     #ModelPersist()
-    
+
     return 1
 
 #
